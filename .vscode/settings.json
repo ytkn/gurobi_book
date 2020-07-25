@@ -1,0 +1,11 @@
+{
+  "python.pythonPath": "/home/yuta/.virtualenvs/scheduing/bin/python",
+  "terminal.integrated.env.linux": {
+    "PYTHONPATH": "${workspaceFolder}"
+  },
+  "python.envFile": "${workspaceFolder}/.env",
+  "python.formatting.autopep8Args": [
+    "--ignore",
+    "E402"
+  ]
+}
