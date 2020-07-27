@@ -2,7 +2,7 @@ import pulp
 from . import logger
 
 
-def exec(problem: pulp.LpProblem, is_given_initial_solution: bool, time_limit: int):
+def exec(problem: pulp.LpProblem, is_given_initial_solution=False, time_limit=200):
     log = logger.get_logger(__name__)
     log.info(f"==========objective=========\n{problem.objective}")
     constraints = "\n".join(
