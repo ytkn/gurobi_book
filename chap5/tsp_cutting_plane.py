@@ -2,22 +2,13 @@ import sys
 import os
 import itertools
 import pulp
-import random
 import networkx
+from graph_utils import *
 from typing import List, Dict, Union, Tuple
 
 sys.path.append('../')
 
 from common import logger, solve_with_log
-
-
-# not metric
-def make_complete_graph(n: int) -> networkx.Graph:
-    G = networkx.Graph()
-    for i, j in itertools.combinations(range(n), 2):
-        w = random.randint(1, 10)
-        G.add_edge(i, j, weight=w)
-    return G
 
 
 def make_problem_and_solve(G: networkx.Graph, n: int):
@@ -48,7 +39,7 @@ def make_problem_and_solve(G: networkx.Graph, n: int):
             if pulp.value(x[i, j]) == 1:
                 g.add_edge(i, j)
         components = list(networkx.connected_components(g))
-        log.info(len(components))
+        log.info(f"components: {len(components)}")
         for c in components:
             log.info(c)
         if len(components) == 1:
@@ -58,18 +49,23 @@ def make_problem_and_solve(G: networkx.Graph, n: int):
                 problem.addConstraint(sum([x[min(i, j), max(i, j)] for i, j in itertools.combinations(component, 2)])
                                       <= len(component) - 1)
 
-    log.info("solution")
+    solution = []
+    log.info("solved")
     for (i, j) in G.edges:
         if pulp.value(x[i, j]) == 1:
-            log.info(f"{i}, {j}")
+            solution.append((i, j))
+
+    return solution
 
 
 def main():
     logger.set_logger()
     log = logger.get_logger(__name__)
     n = 20
-    graph = make_complete_graph(n)
-    make_problem_and_solve(graph, n)
+    x, y = make_points(n)
+    graph = make_euclidean_graph(n, x, y)
+    solution = make_problem_and_solve(graph, n)
+    plot_graph(solution, x, y)
 
 
 if __name__ == "__main__":
