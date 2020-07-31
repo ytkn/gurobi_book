@@ -61,7 +61,7 @@ def make_problem_and_solve(G: networkx.Graph, n: int):
 def main():
     logger.set_logger()
     log = logger.get_logger(__name__)
-    n = 20
+    n = 50
     x, y = make_points(n)
     graph = make_euclidean_graph(n, x, y)
     solution = make_problem_and_solve(graph, n)

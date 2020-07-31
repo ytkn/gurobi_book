@@ -19,6 +19,14 @@ def make_points(n: int):
     return x, y
 
 
+def make_evil_points(n: int):
+    x_base = [random.random() * 10 for _ in range((n + 9) // 10)]
+    y_base = [random.random() * 10 for _ in range((n + 9) // 10)]
+    x = [x_base[i // 10] + random.random() for i in range(n)]
+    y = [y_base[i // 10] + random.random() for i in range(n)]
+    return x, y
+
+
 def make_euclidean_graph(n: int, x: List[float], y: List[float]) -> networkx.Graph:
     G = networkx.Graph()
     for i, j in itertools.combinations(range(n), 2):
@@ -55,3 +63,12 @@ def plot_graph(edges, x, y):
 
     current_time = datetime.now().strftime("%Y%m%d_%H%M%S")
     plt.savefig(os.path.join("images", f"tsp_solution_{current_time}"))
+    plt.clf()
+
+
+def to_directed_graph(g: networkx.Graph) -> networkx.Graph:
+    G = networkx.DiGraph()
+    for (i, j) in g.edges:
+        G.add_edge(i, j, weight=g[i][j]['weight'])
+        G.add_edge(j, i, weight=g[i][j]['weight'])
+    return G
