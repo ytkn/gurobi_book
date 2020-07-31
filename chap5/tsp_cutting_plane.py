@@ -18,17 +18,17 @@ def make_problem_and_solve(G: networkx.Graph, n: int):
     x = {(i, j): pulp.LpVariable(name='x_{}_{}'.format(i, j), cat=pulp.LpBinary)
          for (i, j) in G.edges}
 
-    problem.objective += sum(
+    problem.objective += pulp.lpSum(
         [x[i, j] * G[i][j]['weight'] for (i, j) in G.edges])
 
     for i in range(n):
         problem.addConstraint(
-            sum([x[j, i] for j in range(0, i)]) +
-            sum([x[i, j] for j in range(i + 1, n)])
+            pulp.lpSum([x[j, i] for j in range(0, i)]) +
+            pulp.lpSum([x[i, j] for j in range(i + 1, n)])
             >= 2)
         problem.addConstraint(
-            sum([x[j, i] for j in range(0, i)]) +
-            sum([x[i, j] for j in range(i + 1, n)])
+            pulp.lpSum([x[j, i] for j in range(0, i)]) +
+            pulp.lpSum([x[i, j] for j in range(i + 1, n)])
             <= 2)
 
     solved = False
@@ -46,7 +46,7 @@ def make_problem_and_solve(G: networkx.Graph, n: int):
             solved = True
         else:
             for component in components:
-                problem.addConstraint(sum([x[min(i, j), max(i, j)] for i, j in itertools.combinations(component, 2)])
+                problem.addConstraint(pulp.lpSum([x[min(i, j), max(i, j)] for i, j in itertools.combinations(component, 2)])
                                       <= len(component) - 1)
 
     solution = []
@@ -61,8 +61,9 @@ def make_problem_and_solve(G: networkx.Graph, n: int):
 def main():
     logger.set_logger()
     log = logger.get_logger(__name__)
-    n = 50
-    x, y = make_points(n)
+    # n = 50
+    # x, y = make_points(n)
+    n, x, y = read_hokkaido()
     graph = make_euclidean_graph(n, x, y)
     solution = make_problem_and_solve(graph, n)
     plot_graph(solution, x, y)

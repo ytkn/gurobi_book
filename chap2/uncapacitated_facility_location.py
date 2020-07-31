@@ -48,23 +48,23 @@ def make_problem(instance: Instance):
          for i, j in itertools.product(range(instance.n_customers), range(instance.n_facilities))}
     y = {j: pulp.LpVariable(name='y_{}'.format(j), cat=pulp.LpBinary)
          for j in range(instance.n_facilities)}
-    problem.objective += sum([instance.establishment_cost[j] * y[j]
-                              for j in range(instance.n_facilities)])
-    problem.objective += sum([instance.transportation_cost[i][j] * x[i, j]
-                              for i, j in itertools.product(range(instance.n_customers), range(instance.n_facilities))])
+    problem.objective += pulp.lpSum([instance.establishment_cost[j] * y[j]
+                                     for j in range(instance.n_facilities)])
+    problem.objective += pulp.lpSum([instance.transportation_cost[i][j] * x[i, j]
+                                     for i, j in itertools.product(range(instance.n_customers), range(instance.n_facilities))])
 
     for i, j in itertools.product(range(instance.n_customers), range(instance.n_facilities)):
         problem.addConstraint(x[i, j] >= 0, name=f"x_positive_{i}_{j}")
 
     for i in range(instance.n_customers):
-        problem.addConstraint(sum([x[i, j] for j in range(instance.n_facilities)]) >= instance.demands[i],
+        problem.addConstraint(pulp.lpSum([x[i, j] for j in range(instance.n_facilities)]) >= instance.demands[i],
                               name=f"customer_demands_positive_{i}")
-        problem.addConstraint(sum([x[i, j] for j in range(instance.n_facilities)]) <= instance.demands[i],
+        problem.addConstraint(pulp.lpSum([x[i, j] for j in range(instance.n_facilities)]) <= instance.demands[i],
                               name=f"customer_demands_negative_{i}")
 
-    sum_demands = sum([d for d in instance.demands])
+    sum_demands = pulp.lpSum([d for d in instance.demands])
     for j in range(instance.n_facilities):
-        problem.addConstraint(sum([x[i, j] for i in range(instance.n_customers)]) <= y[j] * sum_demands,
+        problem.addConstraint(pulp.lpSum([x[i, j] for i in range(instance.n_customers)]) <= y[j] * sum_demands,
                               name=f"capacity_{j}")
     return problem
 

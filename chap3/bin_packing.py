@@ -74,17 +74,19 @@ def make_problem(bin_capacity: int, items: List[int]) -> pulp.LpProblem:
          for i in range(n_bins)}
 
     for i in range(n_bins):
-        problem.addConstraint(sum(
+        problem.addConstraint(pulp.lpSum(
             [x[i, j] * items[j] for j in range(n_items)]) <= bin_capacity, name=f"capcacity_{i}")
 
     for j in range(n_items):
-        problem.addConstraint(sum([x[i, j] for i in range(n_bins)]) >= 1)
-        problem.addConstraint(sum([x[i, j] for i in range(n_bins)]) <= 1)
+        problem.addConstraint(pulp.lpSum(
+            [x[i, j] for i in range(n_bins)]) >= 1)
+        problem.addConstraint(pulp.lpSum(
+            [x[i, j] for i in range(n_bins)]) <= 1)
 
     for i, j in itertools.product(range(n_bins), range(n_items)):
         problem.addConstraint(t[i] >= x[i, j])
 
-    problem.objective += sum([t[i] for i in range(n_bins)])
+    problem.objective += pulp.lpSum([t[i] for i in range(n_bins)])
     return problem
 
 
@@ -108,17 +110,19 @@ def make_problem_with_initial_solution(bin_capacity: int, items: List[int], init
         t[i].setInitialValue(1)
 
     for i in range(n_bins):
-        problem.addConstraint(sum(
+        problem.addConstraint(pulp.lpSum(
             [x[i, j] * items[j] for j in range(n_items)]) <= bin_capacity, name=f"capcacity_{i}")
 
     for j in range(n_items):
-        problem.addConstraint(sum([x[i, j] for i in range(n_bins)]) >= 1)
-        problem.addConstraint(sum([x[i, j] for i in range(n_bins)]) <= 1)
+        problem.addConstraint(pulp.lpSum(
+            [x[i, j] for i in range(n_bins)]) >= 1)
+        problem.addConstraint(pulp.lpSum(
+            [x[i, j] for i in range(n_bins)]) <= 1)
 
     for i, j in itertools.product(range(n_bins), range(n_items)):
         problem.addConstraint(t[i] >= x[i, j])
 
-    problem.objective += sum([t[i] for i in range(n_bins)])
+    problem.objective += pulp.lpSum([t[i] for i in range(n_bins)])
     return problem
 
 

@@ -2,6 +2,7 @@ import random
 import networkx
 import itertools
 import os
+import math
 import matplotlib.pyplot as plt
 from datetime import datetime
 from typing import List, Dict, Union, Tuple
@@ -72,3 +73,31 @@ def to_directed_graph(g: networkx.Graph) -> networkx.Graph:
         G.add_edge(i, j, weight=g[i][j]['weight'])
         G.add_edge(j, i, weight=g[i][j]['weight'])
     return G
+
+
+def deg2rad(x):
+    return math.pi * x / 180.0
+
+
+def read_hokkaido():
+    r = 0.65 * 10000
+    path = os.path.join('instances', 'hokkaido.txt')
+    f = open(path, 'r')
+    line = f.readline()
+    lat = []
+    longt = []
+    while line:
+        row = line.split(' ')
+        lat.append(float(row[1]))
+        longt.append(float(row[2].replace('\n', '')))
+        line = f.readline()
+    f.close()
+
+    ave_lat = sum(lat) / len(lat)
+    ave_longt = sum(longt) / len(longt)
+    r_longt = r * math.cos(math.pi * ave_lat / 180)
+
+    x = [deg2rad(l - ave_longt) * r_longt for l in longt]
+    y = [deg2rad(l - ave_lat) * r for l in lat]
+    n = len(x)
+    return n, x, y

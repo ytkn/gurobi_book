@@ -56,7 +56,7 @@ def make_problem_by_tight_constraint(G: networkx.DiGraph, n: int) -> pulp.LpProb
     u = {i: pulp.LpVariable(name='u_{}'.format(i), cat=pulp.LpInteger)
          for i in range(n)}
 
-    problem.objective += sum(
+    problem.objective += pulp.lpSum(
         [x[i, j] * G[i][j]['weight'] for (i, j) in G.edges])
 
     problem.addConstraint(u[0] >= 0)
@@ -74,10 +74,10 @@ def make_problem_by_tight_constraint(G: networkx.DiGraph, n: int) -> pulp.LpProb
     for i in range(n):
         except_i = list(range(n))
         except_i.remove(i)
-        problem.addConstraint(sum([x[i, j] for j in except_i]) >= 1)
-        problem.addConstraint(sum([x[i, j] for j in except_i]) <= 1)
-        problem.addConstraint(sum([x[j, i] for j in except_i]) >= 1)
-        problem.addConstraint(sum([x[j, i] for j in except_i]) <= 1)
+        problem.addConstraint(pulp.lpSum([x[i, j] for j in except_i]) >= 1)
+        problem.addConstraint(pulp.lpSum([x[i, j] for j in except_i]) <= 1)
+        problem.addConstraint(pulp.lpSum([x[j, i] for j in except_i]) >= 1)
+        problem.addConstraint(pulp.lpSum([x[j, i] for j in except_i]) <= 1)
 
     return problem
 

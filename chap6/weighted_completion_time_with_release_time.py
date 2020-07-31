@@ -27,8 +27,8 @@ def make_problem_by_disjunctive_formulation(processing_times: List[int], release
     x = {(i, j): pulp.LpVariable(name='x_{}_{}'.format(i, j), cat=pulp.LpBinary)
          for i, j in itertools.product(range(n), range(n))}
 
-    problem.objective += sum([weights[i] * (s[i] + processing_times[i])
-                              for i in range(n)])
+    problem.objective += pulp.lpSum([weights[i] * (s[i] + processing_times[i])
+                                     for i in range(n)])
 
     for i, j in itertools.combinations(range(n), 2):
         problem.addConstraint(x[i, j] + x[j, i] >= 1)
@@ -37,7 +37,7 @@ def make_problem_by_disjunctive_formulation(processing_times: List[int], release
     for i in range(n):
         problem.addConstraint(s[i] >= release_times[i])
     # Big M
-    M = max(release_times) + sum(processing_times)
+    M = max(release_times) + pulp.lpSum(processing_times)
 
     for i, j in itertools.product(range(n), range(n)):
         problem.addConstraint(
@@ -49,19 +49,19 @@ def make_problem_by_time_index(processing_times: List[int], release_times: List[
     log = logger.get_logger(__name__)
     problem = pulp.LpProblem(name="scheduling", sense=pulp.LpMinimize)
     n = len(weights)
-    max_finish_time = max(release_times) + sum(processing_times)
+    max_finish_time = max(release_times) + pulp.lpSum(processing_times)
 
     x = {(i, t): pulp.LpVariable(name='x_{}_{}'.format(i, j), cat=pulp.LpBinary)
          for i, t in itertools.product(range(n), range(max_finish_time))}
 
-    problem.objective += sum([weights[i] * x[i, t] * (t + processing_times[i])
-                              for i, t in itertools.product(range(n), range(max_finish_time))])
+    problem.objective += pulp.lpSum([weights[i] * x[i, t] * (t + processing_times[i])
+                                     for i, t in itertools.product(range(n), range(max_finish_time))])
 
     for i in range(n):
         problem.addConstraint(
-            sum([x[i, t] for t in range(release_times[i], max_finish_time)]) >= 1)
+            pulp.lpSum([x[i, t] for t in range(release_times[i], max_finish_time)]) >= 1)
         problem.addConstraint(
-            sum([x[i, t] for t in range(release_times[i], max_finish_time)]) <= 1)
+            pulp.lpSum([x[i, t] for t in range(release_times[i], max_finish_time)]) <= 1)
 
     # TODO constraint for forbid duplication
     # for t in range(max_finish_time):

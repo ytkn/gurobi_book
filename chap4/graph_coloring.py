@@ -36,13 +36,15 @@ def make_problem_for_feasibility(n: int, edges: List[Edge], n_colors: int) -> pu
     z = {(i, j): pulp.LpVariable(name=f"z_{i}_{j}", cat=pulp.LpBinary)
          for i, j in edges}
 
-    problem.objective += sum([z[i, j] for i, j in edges])
+    problem.objective += pulp.lpSum([z[i, j] for i, j in edges])
 
-    problem.addConstraint(sum([z[i, j] for i, j in edges]) <= 0)
+    problem.addConstraint(pulp.lpSum([z[i, j] for i, j in edges]) <= 0)
 
     for i in range(n):
-        problem.addConstraint(sum([x[i, j] for j in range(n_colors)]) >= 1)
-        problem.addConstraint(sum([x[i, j] for j in range(n_colors)]) <= 1)
+        problem.addConstraint(pulp.lpSum(
+            [x[i, j] for j in range(n_colors)]) >= 1)
+        problem.addConstraint(pulp.lpSum(
+            [x[i, j] for j in range(n_colors)]) <= 1)
 
     for (i, j), k in itertools.product(edges, range(n_colors)):
         problem.addConstraint(x[i, k] + x[j, k] <= 1 + z[i, j])

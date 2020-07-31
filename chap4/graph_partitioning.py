@@ -35,10 +35,10 @@ def make_problem(n: int, edges: List[Edge]) -> pulp.LpProblem:
     y = {(i, j): pulp.LpVariable(name='y_{}_{}'.format(
         i, j), cat=pulp.LpBinary) for i, j in edges}
 
-    problem.objective += sum([y[i, j] for i, j in edges])
+    problem.objective += pulp.lpSum([y[i, j] for i, j in edges])
 
-    problem.addConstraint(sum([x[i] for i in range(n)]) >= n / 2)
-    problem.addConstraint(sum([x[i] for i in range(n)]) <= n / 2)
+    problem.addConstraint(pulp.lpSum([x[i] for i in range(n)]) >= n / 2)
+    problem.addConstraint(pulp.lpSum([x[i] for i in range(n)]) <= n / 2)
     for i, j in edges:
         problem.addConstraint(x[i] - x[j] <= y[i, j])
         problem.addConstraint(x[j] - x[i] <= y[i, j])
